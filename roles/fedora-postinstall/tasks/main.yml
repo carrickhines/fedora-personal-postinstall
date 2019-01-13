@@ -1,0 +1,96 @@
+---
+
+- name: remove all the packages that you don't need as a sysadmin/devops guy
+  dnf:
+   name:
+    - gnome-boxes
+    - gnome-calendar
+    - gnome-weather
+    - gnome-clocks
+    - gnome-documents
+    - gnome-contacts
+    - gnome-photos
+    - gnome-maps
+    - evolution
+    - rhythmbox
+    - cheese
+    - totem
+    - simple-scan
+    - libreoffice-impress
+    - libreoffice-draw
+    - libreoffice-word
+    - libreoffice-calc
+   state: absent
+  become: true
+
+- name: add rpmfusion repos 
+  dnf:
+   name:
+    - https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm 
+    - https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm 
+  become: true
+
+- name: install needed packages 
+  dnf:
+   name:
+    - git
+    - remmina
+    - geany
+    - python2-libselinux
+    - ffmpeg 
+    - awscli 
+  become: true
+
+- name: upgrade all packages
+  dnf:
+   name: "*"
+   state: latest
+  become: true
+
+- name: set gsettings/dconf true 
+  shell: dconf write {{ item }} true 
+  with_items:
+    - /org/gnome/desktop/privacy/remove-old-temp-files 
+    - /org/gnome/desktop/privacy/remove-old-trash-files 
+    - /org/gnome/desktop/search-providers/disable-external 
+
+- name: set gsettings/dconf false 
+  shell: dconf write {{ item }} false
+  with_items:
+    - /org/gnome/system/location/enabled 
+    - /org/gnome/desktop/privacy/report-technical-problems 
+    - /org/gnome/desktop/privacy/remember-recent-files 
+    - /org/gnome/desktop/a11y/applications/screen-keyboard-enabled 
+    - /org/gnome/desktop/notifications/show-in-lock-screen 
+    - /org/gnome/desktop/sound/event-sounds 
+    - /org/gnome/desktop/interface/toolkit-accessibility 
+
+- name: enable a old files setting for gsettings/dconf privacy 
+  shell: dconf write /org/gnome/desktop/privacy/old-files-age 'uint32 0'
+
+- name: change text scaling for 4k screens 
+  shell: dconf write /org/gnome/desktop/interface/text-scaling-factor '1.2000000000000002'
+
+- name: why do I need all of these directories in home? 
+  shell: rmdir {{ item }} 
+  with_items:
+    - ~/Documents 
+    - ~/Music 
+    - ~/Pictures 
+    - ~/Public 
+    - ~/Templates 
+    - ~/Videos 
+  ignore_errors: yes
+
+- name: fix nautilis default dirs 
+  copy: 
+   src: files/etc/xdg/user-dirs.defaults 
+   dest: /etc/xdg/user-dirs.defaults 
+   mode: u=rw,g=r,o=r 
+  become: true 
+
+- name: fix nautilis home dirs 
+  copy: 
+   src: files/config/user-dirs.dirs 
+   dest: ~/.config/user-dirs.dirs 
+   mode: u=rw 

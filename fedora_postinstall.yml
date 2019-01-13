@@ -1,0 +1,13 @@
+---
+
+######################
+# Tested on Fedora 28 and ansible 2.6.1
+# Example: ansible-playbook fedora_postinstall.yml --ask-become-pass 
+# Change all the gconf settings that should be default, remove unnecessary packages, add my stuff, update 
+# dconf/gsettings can be found via: dconf dump / 
+# Written by Carirck Hines 
+######################
+
+- hosts: localhost 
+  roles: 
+    - fedora-postinstall 
