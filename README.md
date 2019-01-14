@@ -1,6 +1,6 @@
 # fedora-personal-postinstall
 
-fedora-personal-postinstall is ansible post install playbook I wrote to standardize local builds for fedora 28.
+fedora-personal-postinstall is a ansible post install playbook I wrote to standardize local builds for fedora 28.
 
 ## Requirements
 ansible 2.7.5+
