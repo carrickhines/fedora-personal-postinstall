@@ -23,12 +23,21 @@
    state: absent
   become: true
 
-#- name: add rpmfusion repos 
-#  dnf:
-#   name:
-#    - https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm 
-#    - https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm 
-#  become: true
+- name: what is our fedora version 
+  shell: rpm --eval='%fedora'
+  args:
+   warn: no
+  register: fedora_version
+
+# doing it this way because ansible sucks sometimes
+- name: add rpmfusion repos 
+  shell: dnf install {{ item }} -y
+  args:
+   warn: no 
+  with_items:
+    - https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-{{ fedora_version.stdout }}.noarch.rpm  
+    - https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-{{ fedora_version.stdout }}.noarch.rpm  
+  become: true
 
 - name: install needed packages 
   dnf:
@@ -36,7 +45,6 @@
     - git
     - remmina
     - geany
-    - python2-libselinux
     - ffmpeg 
     - awscli 
   become: true
@@ -73,6 +81,8 @@
 
 - name: why do I need all of these directories in home? 
   shell: rmdir {{ item }} 
+  args:
+   warn: no 
   with_items:
     - ~/Documents 
     - ~/Music 
