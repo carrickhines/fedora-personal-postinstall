@@ -18,7 +18,8 @@
     - simple-scan
     - libreoffice-impress
     - libreoffice-draw
-    - libreoffice-word
+    - libreoffice-writer
+    - libreoffice-math
     - libreoffice-calc
    state: absent
   become: true
