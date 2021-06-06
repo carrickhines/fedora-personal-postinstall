@@ -30,6 +30,16 @@
    warn: no
   register: fedora_version
 
+- name: import microsoft.asc for Visual Studio install 
+  shell: rpm --import https://packages.microsoft.com/keys/microsoft.asc
+  args:
+   warn: no
+  become: true
+
+- name: vscode repo 
+  shell: sh -c 'echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/vscode.repo' 
+  become: true
+
 # doing it this way because ansible sucks sometimes
 - name: add rpmfusion repos 
   shell: dnf install {{ item }} -y
@@ -40,6 +50,12 @@
     - https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-{{ fedora_version.stdout }}.noarch.rpm  
   become: true
 
+- name: check-update 
+  shell: dnf check-update 
+  args:
+   warn: no
+  become: true
+
 - name: install needed packages 
   dnf:
    name:
@@ -48,6 +64,7 @@
     - geany
     - ffmpeg 
     - awscli 
+    - code 
   become: true
 
 - name: upgrade all packages
